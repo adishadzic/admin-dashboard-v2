@@ -21,24 +21,19 @@ interface MenuItem {
   href: string;
 }
 
-interface SidebarProps {
-  activeSection: SectionId;
-  setActiveSection: React.Dispatch<React.SetStateAction<SectionId>>;
-}
-
-const Sidebar: React.FC<SidebarProps> = () => {
+const Sidebar: React.FC = () => {
   const pathname = usePathname();
 
   const menuItems: MenuItem[] = [
     { id: "dashboard", label: "Dashboard", icon: Home, href: "/" },
+    { id: "testovi", label: "Testovi", icon: BookOpen, href: "/tests" },
+    { id: "studenti", label: "Studenti", icon: Users, href: "/students" },
     {
       id: "statistika",
       label: "Statistika",
       icon: BarChart3,
-      href: "/studet",
+      href: "/statistics",
     },
-    { id: "testovi", label: "Testovi", icon: BookOpen, href: "/tests" },
-    { id: "studenti", label: "Studenti", icon: Users, href: "/students" },
   ];
 
   const bottomMenuItems: MenuItem[] = [

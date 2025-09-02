@@ -1,27 +1,22 @@
-// app/layout.tsx (NO "use client" here)
+// app/layout.tsx  (SERVER component – bez "use client")
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import ClientLayout from './ClientLayout';
 
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import ResponsiveLayout from './ResponsiveLayout'
-
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Dashboard App',
-  description: 'A simple dashboard application',
-}
+  title: 'FIPU Zadaće',
+  description: '',
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <ResponsiveLayout>{children}</ResponsiveLayout>
+    <html lang="hr">
+      <body className={inter.className} suppressHydrationWarning>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
-  )
+  );
 }

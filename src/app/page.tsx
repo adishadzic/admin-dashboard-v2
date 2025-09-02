@@ -1,227 +1,246 @@
-'use client'
-
-import { Button } from '@/components/ui/button'
-import useLocalStorage from '@/hooks/useLocalStorage';
-import { initialStudents, initialTests } from '@/lib/data';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
+"use client";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
 import {
   Users,
-  BookOpen,
   Clock,
   TrendingUp,
-  UserPlus,
   CheckCircle,
-  AlarmClock,
   ArrowRight,
   MoreHorizontal,
-} from 'lucide-react'
-import { useRouter } from 'next/navigation';
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTests } from "@/hooks/useTests";
+import { estimateDuration } from "@/helpers/calculateMinutes";
+import { formatDate } from "@/helpers/formatDate";
+import { useStudents } from "@/hooks/useStudent";
+import { Student } from "@/types/student";
+import { RequireProfessor } from "@/components/guards";
+import Link from "next/link";
+import { useAttemptsSummary } from "@/hooks/useAttemptsSummary";
 
 export default function Home() {
-  const [students] = useLocalStorage('students', initialStudents);
-  const [tests] = useLocalStorage('tests', initialTests);
-
+  const { tests, loading, error } = useTests();
+  const { students } = useStudents();
   const router = useRouter();
+  const { user } = useAuth();
+  const hour = new Date().getHours();
+  const greeting = hour >= 18 ? "Dobra večer" : "Dobar dan";
+  const name = user?.displayName?.split(" ")[0] ?? "";
+  const { totalAttempts, averagePercent } = useAttemptsSummary();
+  const totalStudents = students.length;
+  const activeTestsCount = tests?.length ?? 0;
+  const topStudents: Student[] = students ?? [];
 
-  const recentTests = tests.map((test) => ({
+  const recentTests = (tests ?? []).map((test) => ({
     ...test,
-    title: test.name,
-    students: `${Math.floor(Math.random() * 50) + 50} students`,
+    title: test.name ?? "Untitled test",
+    durationDisplay: estimateDuration(test),
+    startDateDisplay: formatDate(test.createdAt),
   }));
 
-  const topStudents = students;
+  const recentTestsLimited = recentTests.slice(0, 4);
+  const topStudentsLimited = topStudents.slice(0, 4);
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Dobar dan!</h1>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Users className="w-6 h-6 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Students</p>
-              <p className="text-2xl font-semibold text-gray-900">1,234</p>
-            </div>
-          </div>
+    <RequireProfessor>
+      <div className="p-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {greeting}
+            {name && `, ${name}`}!
+          </h1>{" "}
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Active Courses</p>
-              <p className="text-2xl font-semibold text-gray-900">56</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Clock className="w-6 h-6 text-yellow-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Pending Tasks</p>
-              <p className="text-2xl font-semibold text-gray-900">23</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Monthly Growth</p>
-              <p className="text-2xl font-semibold text-gray-900">12%</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Tests */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Recent tests</h2>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push('/tests')}
-            >
-              View all
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            {recentTests.map((test) => (
-              <div
-                key={test.id}
-                className="flex items-center space-x-4 p-4 rounded-lg hover:bg-gray-50 transition-colors card-hover"
-              >
-                <div className="test-icon">
-                  <img
-                    className="w-8 h-8"
-                    alt="JavaScript quiz icon"
-                    src="https://images.unsplash.com/photo-1597440836382-e5f0bd6155f7"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-gray-900">{test.title}</h3>
-                  <p className="text-sm text-gray-500">
-                    {test.duration} • {test.startDate} • {test.students}
-                  </p>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => {}}>
-                      Edit test details
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => {}}>
-                      See results
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="w-6 h-6 text-blue-600" />
               </div>
-            ))}
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">
+                  Broj studenata
+                </p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {totalStudents}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">
+                  Aktivne zadaće
+                </p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {activeTestsCount}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <Clock className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">
+                  Ukupno pokušaja
+                </p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {totalAttempts}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <TrendingUp className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">
+                  Prosječni rezultat
+                </p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {averagePercent}%
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Top Performing Students */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Top performing students
-            </h2>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {}}
-            >
-              View all
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-500 uppercase tracking-wide pb-2 border-b">
-              <span>IME I PREZIME</span>
-              <span>JMBAG</span>
-              <span>ACTION</span>
+        <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Tests */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Najnovije kontrolne zadaće
+              </h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push("/tests")}
+              >
+                Vidi sve
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
             </div>
 
-            {topStudents.map((student) => (
-              <div
-                key={student.id}
-                className="grid grid-cols-3 gap-4 items-center py-3 hover:bg-gray-50 rounded-lg transition-colors"
+            {loading ? (
+              <div className="text-sm text-gray-500">Učitavam testove…</div>
+            ) : error ? (
+              <div className="text-sm text-red-600">Greška: {error}</div>
+            ) : recentTests.length === 0 ? (
+              <div className="text-sm text-gray-500">
+                Još nema spremljenih testova. Klikni “View all” i dodaj prvi
+                test.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {recentTestsLimited.map((test) => (
+                  <div
+                    key={String(test.id)}
+                    className="flex items-center space-x-4 p-4 rounded-lg hover:bg-gray-50 transition-colors card-hover"
+                  >
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900">
+                        <Link
+                          href={`/tests/${test.id}`}
+                          className="hover:underline"
+                        >
+                          {test.title}
+                        </Link>
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {test.durationDisplay} • Kreiran {test.startDateDisplay}
+                      </p>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="z-50 min-w-[8rem] bg-white border border-gray-200 shadow-md rounded-md p-3">
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => router.push(`/tests/${test.id}`)}
+                        >
+                          See test details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => {}}
+                        >
+                          See results
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Top Performing Students (ostavimo LS dok ne prebacimo na Firestore) */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Top performing students
+              </h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  router.push("/students");
+                }}
               >
-                <span className="font-medium text-gray-900">{student.name}</span>
-                <span className="text-gray-600">{student.jmbag}</span>
-                <Button
-                  variant="link"
-                  className="text-blue-600 hover:text-blue-800 justify-start p-0"
-                  onClick={() => {}}
+                Vidi sve
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-500 uppercase tracking-wide pb-2 border-b">
+                <span>IME I PREZIME</span>
+                <span>JMBAG</span>
+                <span>ACTION</span>
+              </div>
+
+              {topStudentsLimited.map((student) => (
+                <div
+                  key={student.id}
+                  className="grid grid-cols-3 gap-4 items-center py-3 hover:bg-gray-50 rounded-lg transition-colors"
                 >
-                  Vidi profil
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Recent Activity</h2>
-        </div>
-        <div className="p-6">
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <div className="p-1 bg-blue-100 rounded-full">
-                <UserPlus className="w-4 h-4 text-blue-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-900">New student registered: John Doe</p>
-                <p className="text-xs text-gray-500">2 hours ago</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="p-1 bg-green-100 rounded-full">
-                <BookOpen className="w-4 h-4 text-green-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-900">Course Fundamentals completed by 5 students</p>
-                <p className="text-xs text-gray-500">4 hours ago</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="p-1 bg-yellow-100 rounded-full">
-                <AlarmClock className="w-4 h-4 text-yellow-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-900">Assignment deadline reminder sent</p>
-                <p className="text-xs text-gray-500">6 hours ago</p>
-              </div>
+                  <span className="font-medium text-gray-900">
+                    {student.fullName}
+                  </span>
+                  <span className="text-gray-600">{student.jmbag}</span>
+                  <Button
+                    variant="link"
+                    className="text-blue-600 hover:text-blue-800 justify-start p-0 cursor-pointer"
+                    onClick={() => router.push(`/students/${student.id}`)}
+                  >
+                    Vidi profil
+                  </Button>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
-    </div>
-  )
+    </RequireProfessor>
+  );
 }

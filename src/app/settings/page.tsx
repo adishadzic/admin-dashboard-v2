@@ -22,10 +22,10 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
+    <div className="p-8">
+      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Settings</h1>
       
-      <div className="bg-white rounded-lg border border-gray-200 p-6 max-w-2xl mx-auto space-y-8">
+      <div className="bg-white rounded-lg border border-gray-200 p-6 max-w-2xl space-y-8">
         <div className='text-black'>
           <h2 className="text-lg font-semibold mb-4">Notifications</h2>
           <div className="space-y-4">
@@ -50,14 +50,6 @@ const SettingsPage = () => {
              <Button variant="outline" onClick={handleFeatureRequest}>Light Mode</Button>
              <Button variant="outline" onClick={handleFeatureRequest}>Dark Mode</Button>
              <Button variant="outline" onClick={handleFeatureRequest}>System Default</Button>
-          </div>
-        </div>
-
-        <div>
-          <h2 className="text-black text-lg font-semibold mb-4">Account</h2>
-          <div className="space-y-4">
-            <Button variant="outline" onClick={handleFeatureRequest}>Change Password</Button>
-            <Button variant="destructive" onClick={handleFeatureRequest}>Delete Account</Button>
           </div>
         </div>
         
