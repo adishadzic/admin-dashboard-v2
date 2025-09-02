@@ -27,14 +27,17 @@ export default function LoginPage() {
 
       const isProfessor = email.endsWith("@unipu.hr");
       const isStudent = email.endsWith("@student.unipu.hr");
-
-      if (!isProfessor && !isStudent) {
-        setError("Prijava dopuštena samo za @unipu.hr ili @student.unipu.hr račune.");
-        // signOut nije nužan; korisnik može kliknuti ponovno s drugim računom
+      if (isStudent) {
+        router.replace("/profile");
+      } else if (isProfessor) {
+        router.replace("/");
+      } else {
+        setError(
+          "Prijava dopuštena samo za @unipu.hr ili @student.unipu.hr račune."
+        );
         return;
       }
 
-      // Upis/merge user dokumenta s ulogom
       await setDoc(
         doc(db, "users", u.uid),
         {
@@ -53,7 +56,7 @@ export default function LoginPage() {
         {
           fullName: u.displayName ?? "Nepoznato ime",
           email: u.email ?? "",
-          jmbag: "", 
+          jmbag: "",
           year: 1,
           authUid: u.uid,
           createdAt: Date.now(),
@@ -85,11 +88,27 @@ export default function LoginPage() {
           onClick={login}
           className="w-full flex items-center justify-center gap-3 px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition-colors"
         >
-          <svg className="w-5 h-5" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
-            <path d="M533.5 278.4c0-17.4-1.6-34.1-4.6-50.4H272v95.4h147.4c-6.4 34.6-25.6 63.9-54.5 83.5l88.1 68.4c51.5-47.5 80.5-117.5 80.5-196.9z" fill="#4285f4"/>
-            <path d="M272 544.3c73.7 0 135.5-24.3 180.7-66l-88.1-68.4c-24.4 16.4-55.4 26.1-92.6 26.1-71.2 0-131.6-48-153.2-112.4l-90.5 69.9c44.5 88.1 135.5 151.8 243.7 151.8z" fill="#34a853"/>
-            <path d="M118.8 323.6c-10.6-31.9-10.6-66.3 0-98.2L28.3 155.5c-40.6 81.2-40.6 177.4 0 258.6l90.5-69.9z" fill="#fbbc04"/>
-            <path d="M272 107.7c38.8 0 73.7 13.4 101.2 39.6l75.6-75.6C407.5 24.7 345.7 0 272 0 163.8 0 72.8 63.7 28.3 155.5l90.5 69.9c21.6-64.4 82-112.4 153.2-112.4z" fill="#ea4335"/>
+          <svg
+            className="w-5 h-5"
+            viewBox="0 0 533.5 544.3"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M533.5 278.4c0-17.4-1.6-34.1-4.6-50.4H272v95.4h147.4c-6.4 34.6-25.6 63.9-54.5 83.5l88.1 68.4c51.5-47.5 80.5-117.5 80.5-196.9z"
+              fill="#4285f4"
+            />
+            <path
+              d="M272 544.3c73.7 0 135.5-24.3 180.7-66l-88.1-68.4c-24.4 16.4-55.4 26.1-92.6 26.1-71.2 0-131.6-48-153.2-112.4l-90.5 69.9c44.5 88.1 135.5 151.8 243.7 151.8z"
+              fill="#34a853"
+            />
+            <path
+              d="M118.8 323.6c-10.6-31.9-10.6-66.3 0-98.2L28.3 155.5c-40.6 81.2-40.6 177.4 0 258.6l90.5-69.9z"
+              fill="#fbbc04"
+            />
+            <path
+              d="M272 107.7c38.8 0 73.7 13.4 101.2 39.6l75.6-75.6C407.5 24.7 345.7 0 272 0 163.8 0 72.8 63.7 28.3 155.5l90.5 69.9c21.6-64.4 82-112.4 153.2-112.4z"
+              fill="#ea4335"
+            />
           </svg>
           <span className="font-medium">Prijavi se Google računom</span>
         </button>
