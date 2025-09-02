@@ -1,5 +1,10 @@
 import AttemptClient from "./AttemptClient";
 
-export default function AttemptPage({ params }: { params: { id: string } }) {
-  return <AttemptClient id={params.id} />;
+export default async function AttemptPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <AttemptClient id={id} />;
 }
