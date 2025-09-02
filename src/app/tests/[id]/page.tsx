@@ -1,9 +1,6 @@
-// app/tests/[id]/page.tsx
 import type { Metadata } from "next";
 import TestDetailClient from "./TestDetailClient";
 import { RequireProfessor } from "@/components/guards";
-
-type Params = { params: { id: string } };
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: "Test details" };
@@ -12,10 +9,16 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default function TestDetailPage({ params }: Params) {
+export default async function TestDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
   return (
     <RequireProfessor>
-      <TestDetailClient id={params.id} />
+      <TestDetailClient id={id} />
     </RequireProfessor>
   );
 }
