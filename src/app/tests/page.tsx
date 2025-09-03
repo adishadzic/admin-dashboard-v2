@@ -18,7 +18,7 @@ import { formatDate } from "@/helpers/formatDate";
 import { RequireProfessor } from "@/components/guards";
 
 const TestsPage: React.FC = () => {
-  const { tests, loading, error, addTest } = useTests();
+  const { tests, loading, error, addTest, deleteTest } = useTests();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -148,6 +148,22 @@ const TestsPage: React.FC = () => {
                             >
                               Download (.docx)
                             </DropdownMenuItem>
+                            <DropdownMenuItem
+  onClick={async () => {
+    const ok = window.confirm("Jesi li siguran/na da želiš obrisati ovu kontrolnu zadaću?");
+    if (!ok) return;
+    try {
+      await deleteTest(test.id);
+    } catch (e) {
+      console.error(e);
+      alert("Greška pri brisanju testa.");
+    }
+  }}
+  className="text-red-600 focus:text-red-700"
+>
+  Obriši
+</DropdownMenuItem>
+
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
@@ -166,7 +182,7 @@ const TestsPage: React.FC = () => {
             <div className="p-4 border-t border-gray-200 flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
@@ -174,7 +190,7 @@ const TestsPage: React.FC = () => {
                   <ChevronLeft className="w-4 h-4" /> Previous
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   onClick={() =>
                     setCurrentPage(Math.min(totalPages, currentPage + 1))

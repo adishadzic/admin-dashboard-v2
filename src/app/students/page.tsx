@@ -8,17 +8,21 @@ import { Button } from "@/components/ui/button";
 import { useStudents } from "@/hooks/useStudent";
 import { useRole } from "@/hooks/useRole";
 import AddStudentDialog from "@/components/AddStudentDialog";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const YEARS: StudentYear[] = [1, 2, 3, 4, 5];
 
 export default function StudentsPage() {
   const router = useRouter();
-  const role = useRole(); // "professor" | "student" | null
+  const role = useRole();
 
   const { students, loading, error } = useStudents();
   const [searchTerm, setSearchTerm] = useState("");
   const [yearFilter, setYearFilter] = useState<number | "All">("All");
   const [openAdd, setOpenAdd] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const testsPerPage = 2;
 
   const filteredStudents = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
@@ -33,6 +37,17 @@ export default function StudentsPage() {
     });
   }, [students, searchTerm, yearFilter]);
 
+  const indexOfLastTest = currentPage * testsPerPage;
+  const indexOfFirstTest = indexOfLastTest - testsPerPage;
+  const currentTests = filteredStudents.slice(
+    indexOfFirstTest,
+    indexOfLastTest
+  );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredStudents.length / testsPerPage)
+  );
+
   async function handleDelete(id: string) {
     const ok = confirm("Obrisati studenta?");
     if (!ok) return;
@@ -43,8 +58,12 @@ export default function StudentsPage() {
   if (role === "student") {
     return (
       <div className="p-8">
-        <h1 className="text-xl font-semibold text-gray-900 mb-2">Pristup odbijen</h1>
-        <p className="text-gray-600">Ova stranica je dostupna samo profesorima.</p>
+        <h1 className="text-xl font-semibold text-gray-900 mb-2">
+          Pristup odbijen
+        </h1>
+        <p className="text-gray-600">
+          Ova stranica je dostupna samo profesorima.
+        </p>
       </div>
     );
   }
@@ -110,7 +129,6 @@ export default function StudentsPage() {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="overflow-x-auto">
           {loading ? (
@@ -143,7 +161,7 @@ export default function StudentsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredStudents.map((s) => (
+                {currentTests.map((s) => (
                   <tr
                     key={s.id}
                     className="hover:bg-gray-50 cursor-pointer"
@@ -174,6 +192,35 @@ export default function StudentsPage() {
                     </td>
                   </tr>
                 ))}
+
+                <div className="p-4 border-t border-gray-200 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage(Math.max(1, currentPage - 1))
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="w-4 h-4" /> Previous
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage(Math.min(totalPages, currentPage + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      Next <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    Page {currentPage} of {totalPages} (
+                    {filteredStudents.length} items)
+                  </span>
+                </div>
               </tbody>
             </table>
           )}

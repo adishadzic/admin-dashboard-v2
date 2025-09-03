@@ -24,6 +24,7 @@ import { Student } from "@/types/student";
 import { RequireProfessor } from "@/components/guards";
 import Link from "next/link";
 import { useAttemptsSummary } from "@/hooks/useAttemptsSummary";
+import { deleteStudentById } from "@/lib/studentsRepo";
 
 export default function Home() {
   const { tests, loading, error } = useTests();
@@ -180,12 +181,6 @@ export default function Home() {
                         >
                           See test details
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="cursor-pointer"
-                          onClick={() => {}}
-                        >
-                          See results
-                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -194,7 +189,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* Top Performing Students (ostavimo LS dok ne prebacimo na Firestore) */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">
@@ -213,10 +207,10 @@ export default function Home() {
             </div>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-500 uppercase tracking-wide pb-2 border-b">
-                <span>IME I PREZIME</span>
-                <span>JMBAG</span>
-                <span>ACTION</span>
+              <div className="grid grid-cols-2 gap-4 text-sm font-medium text-gray-500 uppercase tracking-wide pb-2 border-b">
+                <span>Ime i prezime</span>
+                <span>Email</span>
+                <span></span>
               </div>
 
               {topStudentsLimited.map((student) => (
@@ -227,14 +221,46 @@ export default function Home() {
                   <span className="font-medium text-gray-900">
                     {student.fullName}
                   </span>
-                  <span className="text-gray-600">{student.jmbag}</span>
-                  <Button
-                    variant="link"
-                    className="text-blue-600 hover:text-blue-800 justify-start p-0 cursor-pointer"
-                    onClick={() => router.push(`/students/${student.id}`)}
-                  >
-                    Vidi profil
-                  </Button>
+                  <span className="text-gray-600 truncate">
+                    {student.email}
+                  </span>
+
+                  <div className="flex justify-end">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="z-50 min-w-[10rem] bg-white border border-gray-200 shadow-md rounded-md p-1">
+                        <DropdownMenuItem
+                          className="cursor-pointer px-3 py-2"
+                          onClick={() => router.push(`/students/${student.id}`)}
+                        >
+                          Idi na profil
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer px-3 py-2 text-red-600 focus:text-red-700"
+                          onClick={async () => {
+                            const ok = confirm("Obrisati ovog studenta?");
+                            if (!ok) return;
+                            try {
+                              await deleteStudentById(student.id);
+                            } catch (e) {
+                              console.error(e);
+                              alert("Greška pri brisanju studenta.");
+                            }
+                          }}
+                        >
+                          Obriši
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               ))}
             </div>
