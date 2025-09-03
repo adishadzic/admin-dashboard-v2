@@ -1,4 +1,3 @@
-// app/ClientLayout.tsx
 'use client';
 
 import Protected from '@/components/Protected';

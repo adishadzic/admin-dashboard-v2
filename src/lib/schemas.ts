@@ -1,4 +1,3 @@
-// src/lib/schemas.ts
 import { z } from "zod";
 
 export const inboundQuestionSchema = z.object({

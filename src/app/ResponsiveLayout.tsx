@@ -8,7 +8,7 @@ import { useRole } from "@/hooks/useRole";
 import { useTests } from "@/hooks/useTests";
 
 export default function ResponsiveLayout({ children }: { children: React.ReactNode }) {
-  const role = useRole();                 // "professor" | "student" | null
+  const role = useRole();
   const { tests } = useTests();
 
   if (role === null) {

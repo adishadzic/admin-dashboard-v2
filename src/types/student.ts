@@ -1,4 +1,3 @@
-// types/student.ts
 export type StudentYear = 1 | 2 | 3 | 4 | 5;
 
 export interface StudentDoc {

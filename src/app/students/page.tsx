@@ -66,14 +66,14 @@ export default function StudentsPage() {
 
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex gap-4">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Pretraži po imenu, emailu ili JMBAG-u…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="text-black pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="xl:w-[370px] text-black pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
               <svg
                 className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"

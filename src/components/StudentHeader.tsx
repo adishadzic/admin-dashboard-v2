@@ -15,7 +15,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import Link from "next/link";
 
 export default function StudentHeader() {
   const { user } = useAuth();
@@ -29,12 +28,7 @@ export default function StudentHeader() {
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-center space-x-3">
-          <Link
-            href="/"
-            className="w-22 h-22 rounded-full flex items-center justify-center"
-          >
-            <img src="/fipu-logo.png" alt="Logo" />
-          </Link>
+            <Image src={"/fipu-logo.png"} width={88} height={88} alt="logo" />
         <span className="text-lg font-semibold text-gray-900">Zadaće</span>
         </div>
 
@@ -72,7 +66,6 @@ export default function StudentHeader() {
               <DropdownMenuItem onClick={() => router.push("/profile")}>
                 View Profile
               </DropdownMenuItem>
-              {/* Studenti ne trebaju Settings */}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut(auth)}>
                 Logout

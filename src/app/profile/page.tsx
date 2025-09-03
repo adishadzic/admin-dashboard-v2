@@ -1,21 +1,27 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebaseClient';
-import { Mail, UserCircle2, LogOut, BadgeCheck } from 'lucide-react';
-import { useRole } from '@/hooks/useRole';
-import StudentProfilePage from '@/components/StudentProfilePage';
-import { useEffect, useState } from 'react';
-import { db } from '@/lib/firebaseClient';
-import { doc, getDoc } from 'firebase/firestore';
-import { Student, StudentDoc, StudentYear } from '@/types/student';
+import Image from "next/image";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebaseClient";
+import {
+  Mail,
+  UserCircle2,
+  LogOut,
+  BadgeCheck,
+  SquareArrowOutUpRight,
+} from "lucide-react";
+import { useRole } from "@/hooks/useRole";
+import StudentProfilePage from "@/components/StudentProfilePage";
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebaseClient";
+import { doc, getDoc } from "firebase/firestore";
+import { Student, StudentDoc, StudentYear } from "@/types/student";
 
 function hiResPhoto(url?: string | null): string | undefined {
   if (!url) return undefined;
-  return url.replace(/\/s\d+-c\//, '/s256-c/');
+  return url.replace(/\/s\d+-c\//, "/s256-c/");
 }
 
 export default function ProfilePage() {
@@ -26,47 +32,52 @@ export default function ProfilePage() {
 
   useEffect(() => {
     let active = true;
-  
+
     async function loadStudent() {
-      if (!user || role !== 'student') {
+      if (!user || role !== "student") {
         if (active) setStudentDoc(null);
         return;
       }
-  
-      const ref = doc(db, 'students', user.uid);
+
+      const ref = doc(db, "students", user.uid);
       const snap = await getDoc(ref);
-  
+
       if (!active) return;
-  
+
       if (snap.exists()) {
         const raw = snap.data() as Partial<StudentDoc>;
-  
+
         const year: StudentYear =
-          raw.year === 1 || raw.year === 2 || raw.year === 3 || raw.year === 4 || raw.year === 5
+          raw.year === 1 ||
+          raw.year === 2 ||
+          raw.year === 3 ||
+          raw.year === 4 ||
+          raw.year === 5
             ? raw.year
             : 1;
-  
+
         const mapped: Student = {
           id: snap.id,
-          fullName: raw.fullName ?? user.displayName ?? 'Nepoznato ime',
-          email: raw.email ?? user.email ?? '',
-          jmbag: raw.jmbag ?? '',
+          fullName: raw.fullName ?? user.displayName ?? "Nepoznato ime",
+          email: raw.email ?? user.email ?? "",
+          jmbag: raw.jmbag ?? "",
           year,
           avatarUrl: raw.avatarUrl ?? undefined,
           testsCompleted: raw.testsCompleted ?? 0,
           averageScore: raw.averageScore ?? 0,
           lastActive: raw.lastActive ?? undefined,
           authUid: raw.authUid ?? user.uid,
-          createdAt: typeof raw.createdAt === 'number' ? raw.createdAt : Date.now(),
+          createdAt:
+            typeof raw.createdAt === "number" ? raw.createdAt : Date.now(),
         };
-  
+
         setStudentDoc(mapped);
       } else {
         const fallback: Student = {
           id: user.uid,
-          fullName: user.displayName ?? 'Nepoznato ime',
-          email: user.email ?? '',
-          jmbag: '',
+          fullName: user.displayName ?? "Nepoznato ime",
+          email: user.email ?? "",
+          jmbag: "",
           year: 1,
           avatarUrl: user.photoURL ?? undefined,
           testsCompleted: 0,
@@ -78,13 +89,12 @@ export default function ProfilePage() {
         setStudentDoc(fallback);
       }
     }
-  
+
     loadStudent();
     return () => {
       active = false;
     };
   }, [user, role]);
-  
 
   if (loading) {
     return <div className="p-8 text-gray-500">Učitavanje…</div>;
@@ -99,16 +109,16 @@ export default function ProfilePage() {
     );
   }
 
-  if (role === 'student') {
+  if (role === "student") {
     return <StudentProfilePage student={studentDoc} />;
   }
 
   const photo = hiResPhoto(user.photoURL);
-  const name = user.displayName ?? 'Nepoznato ime';
-  const email = user.email ?? '—';
+  const name = user.displayName ?? "Nepoznato ime";
+  const email = user.email ?? "—";
 
   const badge =
-    role === 'professor' ? (
+    role === "professor" ? (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800 ml-2 align-middle">
         <BadgeCheck className="w-3 h-3" />
         Profesor
@@ -150,14 +160,17 @@ export default function ProfilePage() {
             </div>
 
             <div className="mt-4 flex items-center gap-3">
-              <a
-                href="https://myaccount.google.com/"
-                target="_blank"
-                rel="noreferrer"
-                className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm"
-              >
-                Manage Google Account
-              </a>
+              <Button asChild variant="outline" size="sm">
+                <a
+                  href="https://myaccount.google.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <SquareArrowOutUpRight className="w-4 h-4" />
+                  Google Account
+                </a>
+              </Button>
+
               <Button
                 variant="outline"
                 size="sm"
