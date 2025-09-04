@@ -67,7 +67,7 @@ export default function AddStudentDialog({ open, onOpenChange }: Props) {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="Npr. Nikola Tanković"
+              placeholder="Npr. Petar Marković"
             />
           </div>
 

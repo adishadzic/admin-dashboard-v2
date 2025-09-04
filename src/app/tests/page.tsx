@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { MoreHorizontal, ChevronLeft, ChevronRight, Bot } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -78,6 +78,7 @@ const TestsPage: React.FC = () => {
             <Button
               onClick={() => setOpenGen(true)}
             >
+              <Bot />
               Generiraj kontrolnu zadaću
             </Button>
           </div>
