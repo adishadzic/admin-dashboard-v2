@@ -66,7 +66,7 @@ export default function AddStudentDialog({ open, onOpenChange }: Props) {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="Npr. Petar Marković"
+              placeholder="npr. Petar Marković"
             />
           </div>
 
@@ -77,7 +77,7 @@ export default function AddStudentDialog({ open, onOpenChange }: Props) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="ime.prezime@unipu.hr"
+              placeholder="ime.prezime@student.unipu.hr"
             />
           </div>
 
