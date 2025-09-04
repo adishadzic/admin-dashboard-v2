@@ -10,12 +10,11 @@ import {
   LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SectionId } from "@/types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 interface MenuItem {
-  id: SectionId;
+  id: string;
   label: string;
   icon: LucideIcon;
   href: string;

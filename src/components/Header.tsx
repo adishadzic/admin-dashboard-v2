@@ -1,22 +1,27 @@
 "use client";
 
-import React, { useEffect, useRef, useState, ChangeEvent, MouseEvent } from "react";
+import React, { useEffect, useRef, useState, ChangeEvent } from "react";
 import { Search, FileText, Bell, ChevronDown, BookOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuTrigger, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebaseClient";
+import { auth, db } from "@/lib/firebaseClient";
 import { useAuth } from "@/hooks/useAuth";
 import Avatar from "react-avatar";
 import GenerateTestDialog from "./GenerateTestDialog";
 import { useTests } from "@/hooks/useTests";
 import { useRole } from "@/hooks/useRole";
+import Link from "next/link";
+import {
+  collection, onSnapshot, orderBy, query, limit
+} from "firebase/firestore";
 
 interface Test {
   id: string | number;
@@ -24,6 +29,29 @@ interface Test {
 }
 interface HeaderProps {
   tests: Test[];
+}
+
+type AttemptFS = {
+  testId: string;
+  testName?: string;
+  studentId: string;
+  studentName?: string;
+  percent: number;
+  submittedAt: number;
+};
+type Attempt = AttemptFS & { id: string };
+
+// util
+function formatWhen(ms?: number): string {
+  if (!ms) return "—";
+  const d = new Date(ms);
+  return d.toLocaleString("hr-HR", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 const Header: React.FC<HeaderProps> = ({ tests }) => {
@@ -37,6 +65,9 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
   const [searchResults, setSearchResults] = useState<Test[]>([]);
   const [isSearchFocused, setIsSearchFocused] = useState<boolean>(false);
   const [openGen, setOpenGen] = useState(false);
+
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
 
   const router = useRouter();
   const photo = user?.photoURL;
@@ -55,10 +86,36 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
     }
   };
 
-  const handleNotificationClick = () => {
-    toast({ title: "🚧 Notifikacije nisu još implementirane." });
-  };
+  // Listen attempts (last 10) for the popup list
+  useEffect(() => {
+    if (!isProfessor) return;
 
+    const qRef = query(
+      collection(db, "attempts"),
+      orderBy("submittedAt", "desc"),
+      limit(10)
+    );
+
+    const unsub = onSnapshot(qRef, (snap) => {
+      const rows: Attempt[] = snap.docs.map((d) => {
+        const raw = d.data() as Partial<AttemptFS>;
+        return {
+          id: d.id,
+          testId: String(raw.testId ?? ""),
+          testName: raw.testName,
+          studentId: String(raw.studentId ?? ""),
+          studentName: raw.studentName,
+          percent: Number(raw.percent ?? 0),
+          submittedAt: Number(raw.submittedAt ?? 0),
+        };
+      });
+      setAttempts(rows);
+    });
+
+    return () => unsub();
+  }, [isProfessor]);
+
+  // Search tests
   useEffect(() => {
     if (searchQuery) {
       const filtered = tests.filter((t) =>
@@ -70,6 +127,7 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
     }
   }, [searchQuery, tests]);
 
+  // Close search dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | globalThis.MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -83,7 +141,6 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
-        {/* Search — samo profesorima ima smisla */}
         <div className="flex items-center space-x-4 flex-1 max-w-md" ref={searchRef}>
           {isProfessor && (
             <div className="relative flex-1">
@@ -124,12 +181,71 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
         <div className="flex items-center space-x-6">
           {isProfessor && (
             <>
-              <button onClick={() => setOpenGen(true)}>
+              <button onClick={() => setOpenGen(true)} aria-label="Generate test">
                 <FileText className="w-6 h-6 text-black cursor-pointer" />
               </button>
-              <button onClick={handleNotificationClick}>
-                <Bell className="w-6 h-6 flex-shrink-0 text-black cursor-pointer" />
-              </button>
+
+              <Popover open={notifOpen} onOpenChange={setNotifOpen}>
+                <PopoverTrigger asChild>
+                  <button aria-label="Notifications" className="relative">
+                    <Bell className="w-6 h-6 flex-shrink-0 text-black cursor-pointer" />
+                    {/* badge removed as requested */}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  align="end"
+                  className="w-[380px] p-0 overflow-hidden"
+                >
+                  <div className="border-b px-4 py-3 flex items-center justify-between bg-gray-50">
+                    <span className="font-medium text-gray-900">Obavijesti</span>
+                  </div>
+
+                  {attempts.length === 0 ? (
+                    <div className="p-4 text-sm text-gray-500">Nema nedavnih pokušaja.</div>
+                  ) : (
+                    <div className="max-h-80 overflow-y-auto">
+                      {attempts.slice(0, 5).map((a) => (
+                        <div
+                          key={a.id}
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50"
+                        >
+                          <span className="mt-1 w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                          <div className="flex-1 text-sm text-gray-800">
+                            <div className="mb-0.5">
+                              <Link
+                                href={`/students/${a.studentId}`}
+                                className="font-medium hover:underline"
+                                onClick={() => setNotifOpen(false)}
+                              >
+                                {a.studentName || `Student ${a.studentId}`}
+                              </Link>{" "}
+                              riješio je{" "}
+                              <Link
+                                href={`/tests/${a.testId}`}
+                                className="font-medium hover:underline"
+                                onClick={() => setNotifOpen(false)}
+                              >
+                                {a.testName || `Test ${a.testId}`}
+                              </Link>{" "}
+                              – {Math.round(a.percent)}%
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {formatWhen(a.submittedAt)}
+                            </div>
+                          </div>
+                          <Link
+                            href={`/attempts/${a.id}`}
+                            className="text-xs text-blue-600 hover:text-blue-800 flex-shrink-0"
+                            onClick={() => setNotifOpen(false)}
+                          >
+                            Detalji
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
             </>
           )}
 
@@ -181,7 +297,6 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
         </div>
       </div>
 
-      {/* samo profesor koristi generator */}
       {isProfessor && (
         <GenerateTestDialog
           open={openGen}

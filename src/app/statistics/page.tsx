@@ -135,7 +135,6 @@ export default function StatisticsPage() {
           </Button>
         </div>
 
-        {/* KPI cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <KpiCard title="Ukupno pokušaja" value={String(totalAttempts)} icon={BookOpen} color="bg-blue-500" />
           <KpiCard title="Aktivni studenti" value={String(activeStudents)} icon={Users} color="bg-green-500" />
@@ -143,9 +142,8 @@ export default function StatisticsPage() {
           <KpiCard title="Postotak riješenosti (30d)" value={`${completionRate}%`} icon={BarChart3} color="bg-orange-500" />
         </div>
 
-        {/* Recent Activity */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Nedavna aktivnost</h3>
 
           {recent.length === 0 ? (
             <div className="text-sm text-gray-500">Nema nedavnih aktivnosti.</div>
@@ -186,7 +184,6 @@ export default function StatisticsPage() {
   );
 }
 
-/* ---------- Presentational ---------- */
 type IconType = React.ComponentType<{ className?: string }>;
 
 function KpiCard({
