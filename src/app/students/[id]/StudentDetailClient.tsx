@@ -21,7 +21,6 @@ export default function StudentDetailClient({ id }: { id: string }) {
         if (!active) return;
 
         if (snap.exists()) {
-          // Firestore doc ➜ Student
           const data = snap.data() as Omit<Student, "id">;
           const mapped: Student = { id: snap.id, ...data };
           setStudent(mapped);
@@ -41,6 +40,5 @@ export default function StudentDetailClient({ id }: { id: string }) {
   if (loading) return <div className="p-6 text-gray-500">Učitavam studenta…</div>;
   if (!student) return <div className="p-6">Student nije pronađen.</div>;
 
-  // StudentProfilePage već prikazuje pokušaje/attempts za danog studenta
   return <StudentProfilePage student={student} />;
 }

@@ -39,7 +39,6 @@ const Sidebar: React.FC = () => {
     { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
   ];
 
-  // Helper to check if the menu item is active based on current path
   const isActive = (href: string) => pathname === href;
 
   return (

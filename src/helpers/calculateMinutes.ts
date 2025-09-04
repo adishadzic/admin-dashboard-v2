@@ -12,7 +12,6 @@ function formatMinutes(total: number): string {
   export function estimateDuration(test: UITest): string {
     const qs = test.questions;
   
-    // ako nema pitanja, vrati postojeći string ako postoji ili "—"
     if (!qs || qs.length === 0) {
       return test.duration && test.duration.trim() !== "" ? test.duration : "—";
     }

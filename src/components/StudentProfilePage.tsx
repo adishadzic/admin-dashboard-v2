@@ -26,10 +26,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRole } from "@/hooks/useRole";
 import type { AttemptDoc } from "@/lib/attemptsRepo";
 
-/** Red koji prikazujemo (može imati doslikan testName) */
 type AttemptRow = AttemptDoc & { id: string };
 
-/** Formatiranje datuma iz epoch ms */
 function formatWhen(ms?: number): string {
   if (!ms) return "—";
   const d = new Date(ms);
@@ -54,25 +52,21 @@ export default function StudentProfilePage({ student }: Props) {
   const { user } = useAuth();
   const role = useRole();
 
-  // Lokalna kopija prikazanih podataka radi optimističnog UI-ja
   const [localStudent, setLocalStudent] = useState<Student | null>(student);
   useEffect(() => setLocalStudent(student), [student]);
 
   const [attempts, setAttempts] = useState<AttemptRow[]>([]);
   const [loadingAttempts, setLoadingAttempts] = useState<boolean>(true);
 
-  // Edit state
   const [editing, setEditing] = useState(false);
   const [jmbag, setJmbag] = useState<string>(student?.jmbag ?? "");
   const [year, setYear] = useState<StudentYear>(student?.year ?? 1);
   const [saving, setSaving] = useState(false);
 
-  // Tko smije uređivati? profesor ili taj isti student
   const canEdit =
     !!localStudent &&
     ((role === "professor") || (role === "student" && user?.uid === localStudent.id));
 
-  // Pretpostavka: id studenta === njegov auth UID (kako spremamo u /students)
   const targetUid = useMemo(() => localStudent?.id ?? null, [localStudent?.id]);
 
   useEffect(() => {
@@ -114,7 +108,6 @@ export default function StudentProfilePage({ student }: Props) {
     return () => unsub();
   }, [targetUid, toast]);
 
-  // Backfill testName ako fali
   useEffect(() => {
     let active = true;
 
@@ -155,10 +148,8 @@ export default function StudentProfilePage({ student }: Props) {
     ? formatWhen(attempts[0].submittedAt)
     : "—";
 
-  // Foto prioritet: student.avatarUrl → Google auth photoURL → fallback
   const photo = localStudent?.avatarUrl ?? user?.photoURL ?? undefined;
 
-  // Sync edit polja kad uđemo u edit
   useEffect(() => {
     if (editing) {
       setJmbag(localStudent?.jmbag ?? "");
@@ -186,7 +177,6 @@ export default function StudentProfilePage({ student }: Props) {
         jmbag,
         year,
       });
-      // Optimistični update prikaza
       setLocalStudent((prev) => (prev ? { ...prev, jmbag, year } as Student : prev));
       setEditing(false);
     } catch (e) {
@@ -203,7 +193,6 @@ export default function StudentProfilePage({ student }: Props) {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">Student Profile</h1>
         {canEdit && !editing && (
@@ -216,13 +205,11 @@ export default function StudentProfilePage({ student }: Props) {
         )}
       </div>
 
-      {/* Student card */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6">
           {photo ? (
             <Image
               src={
-                // povećaj google avatar rezoluciju ako je u obliku /s96-c/
                 photo.replace?.(/\/s\d+-c\//, "/s256-c/") ?? photo
               }
               alt="Student profile picture"
@@ -241,7 +228,6 @@ export default function StudentProfilePage({ student }: Props) {
             <h2 className="text-2xl font-bold">{localStudent.fullName}</h2>
             <p className="text-muted-foreground">{localStudent.email}</p>
 
-            {/* Prikaz / Uređivanje JMBAG + godina */}
             {!editing ? (
               <>
                 <p className="text-sm text-gray-500">JMBAG: {localStudent.jmbag || "—"}</p>
@@ -297,7 +283,6 @@ export default function StudentProfilePage({ student }: Props) {
                   <button
                     onClick={() => {
                       setEditing(false);
-                      // vrati form na trenutno spremljene vrijednosti
                       setJmbag(localStudent.jmbag ?? "");
                       setYear(localStudent.year ?? 1);
                     }}
@@ -345,7 +330,6 @@ export default function StudentProfilePage({ student }: Props) {
         </div>
       </div>
 
-      {/* Attempts table */}
       <div className="bg-white rounded-lg border p-6">
         <h3 className="text-lg font-semibold mb-4">Moji testovi</h3>
 

@@ -6,24 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { UITest, Question, QuestionType } from "@/types/test";
 
-// --- Types for the API response (what /api/generate-test returns) ------------
 interface ApiQuestion {
-  id?: string; // API may or may not return ids; we don't depend on them here
+  id?: string; 
   text: string;
-  type: QuestionType; // "mcq" | "truefalse" | "short"
+  type: QuestionType;
   options?: string[];
   correctAnswer: string;
   topic?: string;
   points?: number;
 }
 interface ApiGeneratedTest {
-  id: string;                 // server assigns uuid
+  id: string;
   title: string;
   description?: string;
   questions: ApiQuestion[];
 }
 
-// Map API -> UITest (UI expects name instead of title, points default, etc.)
 function mapApiToUITest(api: ApiGeneratedTest): Omit<UITest, "createdAt" | "createdBy"> {
   const mappedQuestions: Question[] = (api.questions ?? []).map((q, idx) => ({
     id: q.id ?? `q-${idx + 1}`,
@@ -43,11 +41,9 @@ function mapApiToUITest(api: ApiGeneratedTest): Omit<UITest, "createdAt" | "crea
   };
 }
 
-// --- Props -------------------------------------------------------------------
 type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  // Firestore save injected from the tests page:
   saveTest: (t: Omit<UITest, "id" | "createdAt" | "createdBy">) => Promise<string>;
   onSaved: (newId: string) => void;
 };
@@ -77,7 +73,6 @@ export default function GenerateTestDialog({ open, onOpenChange, saveTest, onSav
 
       const ui = mapApiToUITest(json as ApiGeneratedTest);
 
-      // Do not save fields managed by Firestore (id/createdAt/createdBy):
       const payload: Omit<UITest, "id" | "createdAt" | "createdBy"> = {
         name: ui.name,
         description: ui.description,

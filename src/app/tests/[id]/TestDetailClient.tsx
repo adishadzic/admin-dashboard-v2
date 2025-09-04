@@ -44,7 +44,6 @@ export default function TestDetailClient({ id }: { id: string }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback ako clipboard API nije dostupan
       alert("Nije moguće kopirati link. Pokušaj ponovno.");
     }
   }

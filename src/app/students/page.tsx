@@ -54,7 +54,6 @@ export default function StudentsPage() {
     await deleteStudentById(id);
   }
 
-  // samo profesori
   if (role === "student") {
     return (
       <div className="p-8">

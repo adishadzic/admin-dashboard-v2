@@ -1,4 +1,3 @@
-// components/Protected.tsx
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -13,10 +12,8 @@ export default function Protected({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    // Dozvoli /login bez provjere
     if (pathname?.startsWith('/login')) return;
 
-    // Dozvoli i studente i profesore
     const email = user?.email ?? '';
     const isStudent = email.endsWith('@student.unipu.hr');
     const isProfessor = email.endsWith('@unipu.hr');

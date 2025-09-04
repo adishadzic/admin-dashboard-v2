@@ -12,7 +12,7 @@ const YEARS: StudentYear[] = [1, 2, 3, 4, 5];
 export default function AddStudentDialog({ open, onOpenChange }: Props) {
   const [fullName, setFullName] = React.useState('');
   const [email, setEmail] = React.useState('');
-  const [jmbag, setJmbag] = React.useState('');             // ⬅️ NOVO
+  const [jmbag, setJmbag] = React.useState('');
   const [year, setYear] = React.useState<StudentYear>(1);
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState('');
@@ -22,7 +22,7 @@ export default function AddStudentDialog({ open, onOpenChange }: Props) {
   }
 
   function isValidJmbag(v: string) {
-    return /^[0-9]{10}$/.test(v); // točno 10 znamenki
+    return /^[0-9]{10}$/.test(v);
   }
 
   async function handleSave() {
@@ -36,13 +36,12 @@ export default function AddStudentDialog({ open, onOpenChange }: Props) {
       await addStudent({
         fullName: fullName.trim(),
         email: email.trim(),
-        jmbag: jmbag.trim(),       // ⬅️ NOVO
+        jmbag: jmbag.trim(),
         year,
       });
-      // reset + close
       setFullName('');
       setEmail('');
-      setJmbag('');               // ⬅️ NOVO
+      setJmbag('');
       setYear(1);
       onOpenChange(false);
     } catch {

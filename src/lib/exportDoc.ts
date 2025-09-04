@@ -53,7 +53,7 @@ function numberingOptions(): INumberingOptions {
             alignment: AlignmentType.START,
             style: {
               paragraph: {
-                indent: { left: 720, hanging: 360 }, // 0.5" left, 0.25" hanging
+                indent: { left: 720, hanging: 360 },
                 spacing: { after: 120 },
               },
             },

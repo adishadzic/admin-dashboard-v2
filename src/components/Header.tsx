@@ -41,7 +41,6 @@ type AttemptFS = {
 };
 type Attempt = AttemptFS & { id: string };
 
-// util
 function formatWhen(ms?: number): string {
   if (!ms) return "—";
   const d = new Date(ms);
@@ -86,7 +85,6 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
     }
   };
 
-  // Listen attempts (last 10) for the popup list
   useEffect(() => {
     if (!isProfessor) return;
 
@@ -115,7 +113,6 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
     return () => unsub();
   }, [isProfessor]);
 
-  // Search tests
   useEffect(() => {
     if (searchQuery) {
       const filtered = tests.filter((t) =>
@@ -127,7 +124,6 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
     }
   }, [searchQuery, tests]);
 
-  // Close search dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | globalThis.MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -189,7 +185,6 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
                 <PopoverTrigger asChild>
                   <button aria-label="Notifications" className="relative">
                     <Bell className="w-6 h-6 flex-shrink-0 text-black cursor-pointer" />
-                    {/* badge removed as requested */}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent

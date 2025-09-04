@@ -54,7 +54,6 @@ function autoGrade(
   return { gradedAnswers: graded, autoScore: auto };
 }
 
-/** Ukloni sva undefined polja (rekurzivno) iz objekta/arraya */
 function pruneUndefined<T>(val: T): T {
   if (Array.isArray(val)) {
     // @ts-expect-error – vraćamo isti oblik
@@ -72,12 +71,6 @@ function pruneUndefined<T>(val: T): T {
   return val;
 }
 
-/**
- * Spremi attempt:
- * - automatski boduje MCQ/TF
- * - denormalizira testName radi bržeg prikaza (ako postoji)
- * - nikad ne zapisuje `undefined` u Firestore
- */
 export async function submitAttempt(params: {
   test: UITest;
   student: { uid: string; name?: string; email?: string };
@@ -87,7 +80,7 @@ export async function submitAttempt(params: {
 
   const { gradedAnswers, autoScore } = autoGrade(test, answers);
   const max = computeMaxScore(test);
-  const total = autoScore; // za sad bez manualScore
+  const total = autoScore;
   const percent = max > 0 ? Math.round((total / max) * 100) : 0;
 
   const attempt: AttemptDoc = pruneUndefined({
