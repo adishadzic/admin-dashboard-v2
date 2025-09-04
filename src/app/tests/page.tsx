@@ -78,7 +78,7 @@ const TestsPage: React.FC = () => {
             <Button
               onClick={() => setOpenGen(true)}
             >
-              Dodaj kontrolnu zadaću
+              Generiraj kontrolnu zadaću
             </Button>
           </div>
         </div>
@@ -175,7 +175,7 @@ const TestsPage: React.FC = () => {
 
             {filteredTests.length === 0 && (
               <div className="text-center p-8 text-gray-500">
-                Nema pronađenih testova. Klikni “Dodaj kontrolnu zadaću”.
+                Nema pronađenih testova.
               </div>
             )}
 

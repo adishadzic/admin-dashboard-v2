@@ -283,15 +283,15 @@ const Header: React.FC<HeaderProps> = ({ tests }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-white" align="end">
               <DropdownMenuItem onClick={() => router.push("/profile")}>
-                View Profile
+                Vidi profil
               </DropdownMenuItem>
               {isProfessor && (
                 <DropdownMenuItem onClick={() => router.push("/settings")}>
-                  Settings
+                  Postavke
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Odjava</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

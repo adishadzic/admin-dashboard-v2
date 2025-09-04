@@ -64,11 +64,11 @@ export default function StudentHeader() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-white" align="end">
               <DropdownMenuItem onClick={() => router.push("/profile")}>
-                View Profile
+                Vidi profil
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut(auth)}>
-                Logout
+                Odjava
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

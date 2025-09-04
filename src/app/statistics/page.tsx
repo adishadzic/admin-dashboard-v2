@@ -130,8 +130,8 @@ export default function StatisticsPage() {
       <div className="p-8 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Statistika</h1>
-          <Button disabled onClick={() => { /* reserved for export */ }}>
-            Generate Report
+          <Button disabled>
+            Preuzmi izvještaj
           </Button>
         </div>
 
