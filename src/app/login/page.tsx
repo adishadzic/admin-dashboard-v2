@@ -18,55 +18,60 @@ export default function LoginPage() {
     }
   }, [user, loading, router]);
 
-  const login = async () => {
+  const handleLogin = async () => {
     try {
       setError("");
-      const cred = await signInWithPopup(auth, googleProvider);
-      const u = cred.user;
-      const email = u.email ?? "";
 
-      const isProfessor = email.endsWith("@unipu.hr");
-      const isStudent = email.endsWith("@student.unipu.hr");
-      if (isStudent) {
-        router.replace("/profile");
-      } else if (isProfessor) {
-        router.replace("/");
-      } else {
+      const { user } = await signInWithPopup(auth, googleProvider);
+      const email = user.email ?? "";
+      const name = user.displayName ?? "Nepoznato ime";
+      const photo = user.photoURL ?? "";
+
+      const role = email.endsWith("@unipu.hr")
+        ? "professor"
+        : email.endsWith("@student.unipu.hr")
+        ? "student"
+        : null;
+
+      if (!role) {
+        await auth.signOut();
         setError(
           "Prijava dopuštena samo za @unipu.hr ili @student.unipu.hr račune."
         );
         return;
       }
 
+      router.replace(role === "student" ? "/profile" : "/");
+
       await setDoc(
-        doc(db, "users", u.uid),
+        doc(db, "users", user.uid),
         {
           email,
-          displayName: u.displayName ?? "",
-          photoURL: u.photoURL ?? "",
-          role: isProfessor ? "professor" : "student",
+          displayName: name,
+          photoURL: photo,
+          role,
           updatedAt: Date.now(),
           createdAt: serverTimestamp(),
         },
         { merge: true }
       );
 
-      await setDoc(
-        doc(db, "students", u.uid),
-        {
-          fullName: u.displayName ?? "Nepoznato ime",
-          email: u.email ?? "",
-          jmbag: "",
-          year: 1,
-          authUid: u.uid,
-          createdAt: Date.now(),
-        },
-        { merge: true }
-      );
-
-      router.replace("/");
-    } catch (e) {
-      console.error(e);
+      if (role === "student") {
+        await setDoc(
+          doc(db, "students", user.uid),
+          {
+            fullName: name,
+            email,
+            jmbag: "",
+            year: 1,
+            authUid: user.uid,
+            createdAt: Date.now(),
+          },
+          { merge: true }
+        );
+      }
+    } catch (err) {
+      console.error(err);
       setError("Neuspjela prijava. Pokušajte ponovno.");
     }
   };
@@ -85,7 +90,7 @@ export default function LoginPage() {
         </p>
 
         <button
-          onClick={login}
+          onClick={handleLogin}
           className="w-full flex items-center justify-center gap-3 px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <svg
