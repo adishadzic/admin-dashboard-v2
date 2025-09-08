@@ -8,34 +8,44 @@ import type { UITest, Question } from "@/types/test";
 import { getTestById } from "@/lib/testsRepo";
 
 export default function AttemptClient({ id }: { id: string }) {
-  const [attempt, setAttempt] = React.useState<(AttemptDoc & { id: string }) | null>(null);
+  const [attempt, setAttempt] = React.useState<
+    (AttemptDoc & { id: string }) | null
+  >(null);
   const [test, setTest] = React.useState<UITest | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const snap = await getDoc(doc(db, "attempts", id));
-      if (!mounted) return;
+    let isActive = true;
 
-      if (!snap.exists()) {
+    const fetchAttemptAndTest = async () => {
+      const attemptRef = doc(db, "attempts", id);
+      const attemptSnap = await getDoc(attemptRef);
+
+      if (!isActive) return;
+
+      if (!attemptSnap.exists()) {
         setAttempt(null);
         setLoading(false);
         return;
       }
 
-      const att = { id: snap.id, ...(snap.data() as AttemptDoc) };
-      setAttempt(att);
+      const attemptData: AttemptDoc & { id: string } = {
+        id: attemptSnap.id,
+        ...(attemptSnap.data() as AttemptDoc),
+      };
+      setAttempt(attemptData);
 
-      const t = await getTestById(att.testId);
-      if (!mounted) return;
-      setTest(t);
+      const relatedTest = await getTestById(attemptData.testId);
+      if (!isActive) return;
 
+      setTest(relatedTest);
       setLoading(false);
-    })();
+    };
+
+    fetchAttemptAndTest();
 
     return () => {
-      mounted = false;
+      isActive = false;
     };
   }, [id]);
 
@@ -49,7 +59,10 @@ export default function AttemptClient({ id }: { id: string }) {
     <div className="px-6 py-8 max-w-3xl mx-auto">
       <h1 className="text-2xl font-semibold mb-2">Rezultat</h1>
       <p className="text-gray-700">
-        Ukupno: <strong>{attempt.totalScore}/{attempt.maxScore}</strong>{" "}
+        Ukupno:{" "}
+        <strong>
+          {attempt.totalScore}/{attempt.maxScore}
+        </strong>{" "}
         (<strong>{attempt.percent}%</strong>)
       </p>
       <p className="text-sm text-gray-500 mt-1">
@@ -93,24 +106,27 @@ export default function AttemptClient({ id }: { id: string }) {
                         <span>{q.correctAnswer}</span>{" "}
                       </>
                     ) : null}
-                    <span className={a.isCorrect ? "text-green-600" : "text-red-600"}>
+                    <span
+                      className={
+                        a.isCorrect ? "text-green-600" : "text-red-600"
+                      }
+                    >
                       {a.isCorrect ? " (točno)" : " (netočno)"}
                     </span>
                     {typeof a.awardedPoints === "number" && (
                       <> — +{a.awardedPoints} bod(ova)</>
                     )}
                   </div>
+                ) : typeof a.awardedPoints === "number" &&
+                  a.awardedPoints > 0 ? (
+                  <div className="text-sm mt-1">
+                    <span className="text-gray-500">Dodijeljeni bodovi:</span> +
+                    {a.awardedPoints}
+                  </div>
                 ) : (
-                  typeof a.awardedPoints === "number" && a.awardedPoints > 0 ? (
-                    <div className="text-sm mt-1">
-                      <span className="text-gray-500">Dodijeljeni bodovi:</span>{" "}
-                      +{a.awardedPoints}
-                    </div>
-                  ) : (
-                    <div className="text-sm mt-1 text-amber-600">
-                      Čeka ručno ocjenjivanje.
-                    </div>
-                  )
+                  <div className="text-sm mt-1 text-amber-600">
+                    Čeka ručno ocjenjivanje.
+                  </div>
                 )}
               </li>
             );

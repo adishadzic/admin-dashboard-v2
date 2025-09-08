@@ -51,7 +51,7 @@ export function RequireStudent({ children }: Props) {
   useEffect(() => {
     if (role === null) return;
     if (role !== 'student' && pathname !== '/profile') {
-      router.replace('/profile');
+      router.replace('/');
     }
   }, [role, router, pathname]);
 

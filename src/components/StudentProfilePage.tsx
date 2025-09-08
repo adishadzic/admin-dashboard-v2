@@ -194,7 +194,7 @@ export default function StudentProfilePage({ student }: Props) {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-900">Student Profile</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">Profil studenta</h1>
         {canEdit && !editing && (
           <button
             className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm"
@@ -304,7 +304,7 @@ export default function StudentProfilePage({ student }: Props) {
             <BookOpen className="w-6 h-6 text-blue-600" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Tests Completed</p>
+            <p className="text-sm text-muted-foreground">Broj riješenih zadaća</p>
             <p className="text-2xl font-bold">{testsCompleted}</p>
           </div>
         </div>
@@ -314,7 +314,7 @@ export default function StudentProfilePage({ student }: Props) {
             <TrendingUp className="w-6 h-6 text-green-600" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Average Score</p>
+            <p className="text-sm text-muted-foreground">Prosječni rezultat</p>
             <p className="text-2xl font-bold text-green-600">{avgScore}%</p>
           </div>
         </div>
@@ -324,7 +324,7 @@ export default function StudentProfilePage({ student }: Props) {
             <CheckCircle className="w-6 h-6 text-purple-600" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Last Active</p>
+            <p className="text-sm text-muted-foreground">Zadnje aktivan</p>
             <p className="text-lg font-semibold">{lastActiveText}</p>
           </div>
         </div>
@@ -360,9 +360,9 @@ export default function StudentProfilePage({ student }: Props) {
                 {attempts.map((a) => (
                   <tr key={a.id} className="hover:bg-gray-50">
                     <td className="px-6 py-3 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">
+                      <span className="font-medium text-gray-900">
                         {a.testName ?? a.testId}
-                      </div>
+                      </span>
                     </td>
                     <td className="px-6 py-3 whitespace-nowrap">
                       <span

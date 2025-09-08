@@ -186,7 +186,7 @@ export default function StudentsPage() {
                         className="text-red-600 hover:text-red-900"
                         onClick={() => handleDelete(s.id)}
                       >
-                        Delete
+                        Obriši
                       </button>
                     </td>
                   </tr>

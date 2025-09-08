@@ -25,7 +25,7 @@ export default function StudentHeader() {
   const isStudent = role === "student";
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <header className="bg-white border-b border-gray-200 px-6 py-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-center space-x-3">
             <Image src={"/fipu-logo.png"} width={88} height={88} alt="logo" />

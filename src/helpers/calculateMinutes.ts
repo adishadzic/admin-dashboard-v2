@@ -12,24 +12,22 @@ function formatMinutes(total: number): string {
   export function estimateDuration(test: UITest): string {
     const qs = test.questions;
   
-    if (!qs || qs.length === 0) {
-      return test.duration && test.duration.trim() !== "" ? test.duration : "—";
-    }
-  
     let minutes = 0;
-    for (const q of qs) {
-      switch (q.type) {
-        case "mcq":
-          minutes += 2;
-          break;
-        case "truefalse":
-          minutes += 1;
-          break;
-        case "short":
-          minutes += 3;
-          break;
-        default:
-          minutes += 2;
+    if(qs) {
+      for (const q of qs) {
+        switch (q.type) {
+          case "mcq":
+            minutes += 2;
+            break;
+          case "truefalse":
+            minutes += 1;
+            break;
+          case "short":
+            minutes += 3;
+            break;
+          default:
+            minutes += 2;
+        }
       }
     }
     return formatMinutes(minutes);

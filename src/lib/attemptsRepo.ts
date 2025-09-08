@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebaseClient";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, getDocs, limit, query, where } from "firebase/firestore";
 import type { UITest, Question } from "@/types/test";
 
 export type AttemptAnswer = {
@@ -25,6 +25,18 @@ export type AttemptDoc = {
   percent: number;
 };
 
+type AttemptAlreadySubmittedError = Error & {
+  code: "attempt/already-submitted";
+  attemptId?: string;
+};
+
+function makeAlreadySubmittedError(attemptId?: string): AttemptAlreadySubmittedError {
+  const err = new Error("Već postoji predan pokušaj za ovaj test.") as AttemptAlreadySubmittedError;
+  err.code = "attempt/already-submitted";
+  if (attemptId) err.attemptId = attemptId;
+  return err;
+}
+
 function computeMaxScore(test: UITest): number {
   return (test.questions ?? []).reduce((s, q) => s + (q.points ?? 1), 0);
 }
@@ -35,28 +47,24 @@ function autoGrade(
 ): { gradedAnswers: AttemptAnswer[]; autoScore: number } {
   const byId = new Map<string, Question>();
   for (const q of test.questions ?? []) byId.set(String(q.id), q);
-
   let auto = 0;
   const graded = answers.map((a) => {
     const q = byId.get(a.questionId);
     if (!q) return { ...a, isCorrect: false, awardedPoints: 0 };
-
     if (q.type === "mcq" || q.type === "truefalse") {
       const ok = (a.value ?? "").trim() === (q.correctAnswer ?? "").trim();
       const pts = ok ? (q.points ?? 1) : 0;
       auto += pts;
       return { ...a, isCorrect: ok, awardedPoints: pts };
     }
-
     return { ...a, isCorrect: null, awardedPoints: 0 };
   });
-
   return { gradedAnswers: graded, autoScore: auto };
 }
 
 function pruneUndefined<T>(val: T): T {
   if (Array.isArray(val)) {
-    // @ts-expect-error – vraćamo isti oblik
+    // @ts-expect-error recursion keeps structure
     return val.map(pruneUndefined);
   }
   if (val && typeof val === "object") {
@@ -65,10 +73,40 @@ function pruneUndefined<T>(val: T): T {
       if (v === undefined) continue;
       out[k] = pruneUndefined(v as unknown);
     }
-    // @ts-expect-error – vraćamo isti oblik
+    // @ts-expect-error returning same shape
     return out;
   }
   return val;
+}
+
+export async function getLatestAttemptFor(
+  testId: string,
+  studentId: string
+): Promise<(AttemptDoc & { id: string }) | null> {
+  const qref = query(
+    collection(db, "attempts"),
+    where("testId", "==", String(testId)),
+    where("studentId", "==", String(studentId)),
+    limit(1)
+  );
+  const snap = await getDocs(qref);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { id: d.id, ...(d.data() as AttemptDoc) };
+}
+
+export async function hasAttemptFor(
+  testId: string,
+  studentId: string
+): Promise<boolean> {
+  const qref = query(
+    collection(db, "attempts"),
+    where("testId", "==", String(testId)),
+    where("studentId", "==", String(studentId)),
+    limit(1)
+  );
+  const snap = await getDocs(qref);
+  return !snap.empty;
 }
 
 export async function submitAttempt(params: {
@@ -77,12 +115,14 @@ export async function submitAttempt(params: {
   answers: AttemptAnswer[];
 }): Promise<string> {
   const { test, student, answers } = params;
-
+  if (await hasAttemptFor(String(test.id), student.uid)) {
+    const existing = await getLatestAttemptFor(String(test.id), student.uid);
+    throw makeAlreadySubmittedError(existing?.id);
+  }
   const { gradedAnswers, autoScore } = autoGrade(test, answers);
   const max = computeMaxScore(test);
   const total = autoScore;
   const percent = max > 0 ? Math.round((total / max) * 100) : 0;
-
   const attempt: AttemptDoc = pruneUndefined({
     testId: String(test.id),
     ...(test.name ? { testName: test.name } : {}),
@@ -98,7 +138,6 @@ export async function submitAttempt(params: {
     maxScore: max,
     percent,
   });
-
   const ref = await addDoc(collection(db, "attempts"), attempt);
   return ref.id;
 }

@@ -36,7 +36,7 @@ const Sidebar: React.FC = () => {
   ];
 
   const bottomMenuItems: MenuItem[] = [
-    { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
+    { id: "settings", label: "Postavke", icon: Settings, href: "/settings" },
   ];
 
   const isActive = (href: string) => pathname === href;

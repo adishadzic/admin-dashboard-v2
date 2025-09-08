@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RAZVOJ WEB APLIKACIJE ZA GENERIRANJE I PROVEDBU KONTROLNIH ZADAĆA  
 
-## Getting Started
+**Diplomski rad**  
+**Autor:** Adis Hadžić 
 
-First, run the development server:
+**Mentor:** doc.dr.sc. Nikola Tanković 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Sveučilište Jurja Dobrile u Puli  
+Fakultet informatike  
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📌 Sažetak  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Ova aplikacija je nastala iz potrebe da se profesorima olakša svakodnevni posao oko pripreme i provođenja kontrolnih zadaća, a studentima da se pruži jednostavniji i pregledniji način rješavanja istih.  
 
-## Learn More
+Profesori kroz sučelje mogu **generirati testove pomoću AI-a**, podijeliti ih studentima putem linka ili ih preuzeti kao **Word dokument**.  
+Studenti testove rješavaju online i odmah nakon predaje vide svoj rezultat. Sve predaje se automatski spremaju u bazu, a na stranici sa statistikama profesor ima pregled pokušaja, prosječnih rezultata i aktivnosti studenata.  
 
-To learn more about Next.js, take a look at the following resources:
+🎯 Cilj aplikacije je smanjiti papirologiju i nepotrebno trošenje vremena, a cijeli proces učiniti bržim i transparentnijim za obje strane.  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ⚙️ Funkcionalnosti  
 
-## Deploy on Vercel
+- **Studenti**  
+  - Rješavanje kontrolnih zadaća putem poveznice  
+  - Pregled i uvid u vlastite rezultate  
+  - Pregled statistike postignuća  
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Profesori**  
+  - Generiranje testova pomoću AI-a (MCQ, True/False, kratki odgovor)  
+  - Ručno dodavanje i administracija studenata  
+  - Pregled detalja svakog testa i mogućnost dijeljenja putem linka  
+  - Preuzimanje testova u **.docx** formatu  
+  - Pregled rezultata i statistika kroz dashboard (KPI pokazatelji, nedavna aktivnost)  
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🔑 Pristup aplikaciji
+
+Pristup aplikaciji omogućen je isključivo korisnicima s e-mail domenama:  
+- `@unipu.hr` → **profesori**  
+- `@student.unipu.hr` → **studenti**  
+
+---
+
+## 🌐 Web aplikacija  
+
+👉 [Pokreni demo aplikaciju na Vercelu](https://admin-dashboard-v2-five.vercel.app/)  
+
+---
+
+## 📄 Dokumentacija  
+
+Priložena dokumentacija diplomskog rada.  

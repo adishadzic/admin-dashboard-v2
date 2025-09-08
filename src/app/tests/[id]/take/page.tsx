@@ -1,4 +1,4 @@
-import RequireStudent from "@/components/auth/RequireStudent";
+import { RequireStudent } from "@/components/guards";
 import TakeTestClient from "./TakeTestClient";
 
 export default async function TakePage({
