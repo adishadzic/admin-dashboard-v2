@@ -49,8 +49,3 @@ Pristup aplikaciji omogućen je isključivo korisnicima s e-mail domenama:
 
 👉 [Pokreni demo aplikaciju na Vercelu](https://admin-dashboard-v2-five.vercel.app/)  
 
----
-
-## 📄 Dokumentacija  
-
-Priložena dokumentacija diplomskog rada.  
